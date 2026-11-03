@@ -1,0 +1,9 @@
+bin/
+build/
+.env
+.vscode/
+coverage.out
+coverage.html
+*.key
+*.csr
+*.crt

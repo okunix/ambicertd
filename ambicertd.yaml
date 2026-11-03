@@ -1,0 +1,4 @@
+server:
+  tls:
+    cert: ambicertd.crt
+    key: ambicertd.key
