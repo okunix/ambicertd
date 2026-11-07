@@ -86,3 +86,8 @@ func StackTrace(err error) string {
 func WithStack(err error) error {
 	return pkgerr.WithStack(err)
 }
+
+type MultiError interface {
+	error
+	Unwrap() []error
+}
