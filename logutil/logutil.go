@@ -41,18 +41,24 @@ func expandError(err error) slog.Attr {
 }
 
 func replaceAttr(groups []string, a slog.Attr) slog.Attr {
-	if a.Key == errorAttrKey {
+	switch a.Key {
+	case errorAttrKey:
 		err, ok := a.Value.Any().(error)
 		if !ok {
 			return a
 		}
 		return expandError(err)
+	case "api_key", "password", "token", "secret":
+		return slog.String(a.Key, "[REDACTED]")
 	}
 	return a
 }
 
 func Logger(level slog.Level) (*slog.Logger, error) {
-	stdoutHandler := slog.NewJSONHandler(os.Stdout,
-		&slog.HandlerOptions{Level: level, ReplaceAttr: replaceAttr})
-	return slog.New(stdoutHandler), nil
+	handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level:       level,
+		AddSource:   true,
+		ReplaceAttr: replaceAttr,
+	})
+	return slog.New(handler), nil
 }
