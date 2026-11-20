@@ -14,9 +14,13 @@ import (
 	"github.com/okunix/ambicertd/config"
 	"github.com/okunix/ambicertd/logutil"
 	"github.com/okunix/ambicertd/router"
+	"github.com/okunix/ambicertd/version"
 )
 
-var configPath string
+var (
+	configPath  string
+	showVersion bool
+)
 
 func init() {
 	flag.StringVar(
@@ -25,10 +29,21 @@ func init() {
 		"/etc/ambicertd/ambicertd.yaml",
 		"ambicertd config file path",
 	)
+	flag.BoolVar(&showVersion, "version", false, "show version")
 }
 
 func main() {
 	flag.Parse()
+
+	if showVersion {
+		fmt.Printf(
+			"Version: %s\nGit Commit SHA: %s\nBuild Time: %s\n",
+			version.Version(),
+			version.GitSHA(),
+			version.BuildTime(),
+		)
+		os.Exit(0)
+	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	exitCode := run(ctx)
