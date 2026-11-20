@@ -4,55 +4,51 @@
 
 package queries
 
-import (
-	"time"
-)
-
 type Certificate struct {
-	ID               int64      `json:"id"`
-	CsrID            int64      `json:"csr_id"`
-	UserID           int64      `json:"user_id"`
-	SerialNumber     string     `json:"serial_number"`
-	CommonName       *string    `json:"common_name"`
-	CertPem          string     `json:"cert_pem"`
-	NotBefore        time.Time  `json:"not_before"`
-	NotAfter         time.Time  `json:"not_after"`
-	Status           string     `json:"status"`
-	RevokedAt        *time.Time `json:"revoked_at"`
-	RevocationReason *int64     `json:"revocation_reason"`
+	ID               int64   `json:"id"`
+	CsrID            int64   `json:"csr_id"`
+	SerialNumber     string  `json:"serial_number"`
+	CommonName       *string `json:"common_name"`
+	CertPem          string  `json:"cert_pem"`
+	NotBefore        string  `json:"not_before"`
+	NotAfter         string  `json:"not_after"`
+	Status           string  `json:"status"`
+	RevokedAt        *string `json:"revoked_at"`
+	RevocationReason *int64  `json:"revocation_reason"`
 }
 
 type Csr struct {
-	ID          int64      `json:"id"`
-	UserID      int64      `json:"user_id"`
-	CsrPem      string     `json:"csr_pem"`
-	Status      string     `json:"status"`
-	PolicyID    *int64     `json:"policy_id"`
-	CreatedAt   *time.Time `json:"created_at"`
-	ProcessedAt *time.Time `json:"processed_at"`
-	ProcessedBy *int64     `json:"processed_by"`
+	ID            int64   `json:"id"`
+	UserID        int64   `json:"user_id"`
+	CsrPem        string  `json:"csr_pem"`
+	Status        string  `json:"status"`
+	RequestedDays *int64  `json:"requested_days"`
+	CreatedAt     string  `json:"created_at"`
+	ProcessedAt   *string `json:"processed_at"`
+	ProcessedBy   *int64  `json:"processed_by"`
 }
 
 type Policy struct {
-	ID           int64      `json:"id"`
-	Name         string     `json:"name"`
-	Description  *string    `json:"description"`
-	AutoSign     int64      `json:"auto_sign"`
-	ValidityDays int64      `json:"validity_days"`
-	RulesJson    string     `json:"rules_json"`
-	CreatedAt    *time.Time `json:"created_at"`
+	ID               int64   `json:"id"`
+	Name             string  `json:"name"`
+	Description      *string `json:"description"`
+	AutoSign         int64   `json:"auto_sign"`
+	SubjectCnRegex   *string `json:"subject_cn_regex"`
+	SanDnsRegex      *string `json:"san_dns_regex"`
+	MaxRequestedDays *int64  `json:"max_requested_days"`
+	CreatedAt        string  `json:"created_at"`
 }
 
 type User struct {
-	ID           int64      `json:"id"`
-	Username     string     `json:"username"`
-	PasswordHash string     `json:"password_hash"`
-	Role         string     `json:"role"`
-	CreatedAt    *time.Time `json:"created_at"`
+	ID           int64  `json:"id"`
+	Username     string `json:"username"`
+	PasswordHash string `json:"password_hash"`
+	Role         string `json:"role"`
+	CreatedAt    string `json:"created_at"`
 }
 
 type UserPolicy struct {
-	UserID     int64      `json:"user_id"`
-	PolicyID   int64      `json:"policy_id"`
-	AssignedAt *time.Time `json:"assigned_at"`
+	UserID     int64  `json:"user_id"`
+	PolicyID   int64  `json:"policy_id"`
+	AssignedAt string `json:"assigned_at"`
 }

@@ -9,17 +9,57 @@ import (
 	"context"
 )
 
+const changePassword = `-- name: ChangePassword :execrows
+UPDATE users SET password_hash = ? WHERE username = ?
+`
+
+type ChangePasswordParams struct {
+	PasswordHash string `json:"password_hash"`
+	Username     string `json:"username"`
+}
+
+func (q *Queries) ChangePassword(ctx context.Context, arg ChangePasswordParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, changePassword, arg.PasswordHash, arg.Username)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (username, password_hash) VALUES (?, ?) RETURNING id, username, password_hash, role, created_at
+INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?) RETURNING id, username, password_hash, role, created_at
 `
 
 type CreateUserParams struct {
 	Username     string `json:"username"`
 	PasswordHash string `json:"password_hash"`
+	Role         string `json:"role"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (*User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.PasswordHash)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.PasswordHash, arg.Role)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PasswordHash,
+		&i.Role,
+		&i.CreatedAt,
+	)
+	return &i, err
+}
+
+const getUserByUsernameAndPassword = `-- name: GetUserByUsernameAndPassword :one
+SELECT id, username, password_hash, role, created_at FROM users WHERE username = ? AND password_hash = ?
+`
+
+type GetUserByUsernameAndPasswordParams struct {
+	Username     string `json:"username"`
+	PasswordHash string `json:"password_hash"`
+}
+
+func (q *Queries) GetUserByUsernameAndPassword(ctx context.Context, arg GetUserByUsernameAndPasswordParams) (*User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByUsernameAndPassword, arg.Username, arg.PasswordHash)
 	var i User
 	err := row.Scan(
 		&i.ID,

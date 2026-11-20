@@ -11,4 +11,4 @@ SELECT * FROM policies WHERE name = ?;
 SELECT * FROM policies WHERE id = ?;
 
 -- name: AddPolicy :one
-INSERT INTO policies (name, description, auto_sign, validity_days, rules_json, created_at) VALUES (?, ?, ?, ?, ?, ?) RETURNING *;
+INSERT INTO policies (name, description, auto_sign, subject_cn_regex, san_dns_regex, max_requested_days, created_at) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *;
