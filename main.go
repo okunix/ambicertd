@@ -19,7 +19,12 @@ import (
 var configPath string
 
 func init() {
-	flag.StringVar(&configPath, "config", "/etc/ambicertd/ambicertd.yaml", "ambicertd config file path")
+	flag.StringVar(
+		&configPath,
+		"config",
+		"/etc/ambicertd/ambicertd.yaml",
+		"ambicertd config file path",
+	)
 }
 
 func main() {
