@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/okunix/ambicertd/errutil"
+	"github.com/okunix/ambicertd/version"
 )
 
 const LoggerContextKey = "loggerContext"
@@ -60,5 +61,8 @@ func Logger(level slog.Level) (*slog.Logger, error) {
 		AddSource:   true,
 		ReplaceAttr: replaceAttr,
 	})
-	return slog.New(handler), nil
+	logger := slog.New(handler).
+		With("version", version.Version()).
+		With("build_time", version.BuildTime())
+	return logger, nil
 }
