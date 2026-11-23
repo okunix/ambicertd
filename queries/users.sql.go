@@ -49,17 +49,46 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (*User, 
 	return &i, err
 }
 
-const getUserByUsernameAndPassword = `-- name: GetUserByUsernameAndPassword :one
+const deleteUserByID = `-- name: DeleteUserByID :execrows
+DELETE FROM users WHERE id = ?
+`
+
+func (q *Queries) DeleteUserByID(ctx context.Context, id int64) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteUserByID, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const getUserByCredentials = `-- name: GetUserByCredentials :one
 SELECT id, username, password_hash, role, created_at FROM users WHERE username = ? AND password_hash = ?
 `
 
-type GetUserByUsernameAndPasswordParams struct {
+type GetUserByCredentialsParams struct {
 	Username     string `json:"username"`
 	PasswordHash string `json:"password_hash"`
 }
 
-func (q *Queries) GetUserByUsernameAndPassword(ctx context.Context, arg GetUserByUsernameAndPasswordParams) (*User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByUsernameAndPassword, arg.Username, arg.PasswordHash)
+func (q *Queries) GetUserByCredentials(ctx context.Context, arg GetUserByCredentialsParams) (*User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByCredentials, arg.Username, arg.PasswordHash)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PasswordHash,
+		&i.Role,
+		&i.CreatedAt,
+	)
+	return &i, err
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, username, password_hash, role, created_at FROM users WHERE id = ?
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id int64) (*User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(
 		&i.ID,

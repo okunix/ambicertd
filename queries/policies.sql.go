@@ -47,6 +47,30 @@ func (q *Queries) AddPolicy(ctx context.Context, arg AddPolicyParams) (*Policy, 
 	return &i, err
 }
 
+const deletePolicyByID = `-- name: DeletePolicyByID :execrows
+DELETE FROM policies WHERE id = ?
+`
+
+func (q *Queries) DeletePolicyByID(ctx context.Context, id int64) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deletePolicyByID, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
+const deletePolicyByName = `-- name: DeletePolicyByName :execrows
+DELETE FROM policies WHERE name = ?
+`
+
+func (q *Queries) DeletePolicyByName(ctx context.Context, name string) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deletePolicyByName, name)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
 const getPolicies = `-- name: GetPolicies :many
 SELECT id, name, description, auto_sign, subject_cn_regex, san_dns_regex, max_requested_days, created_at FROM policies
 `
@@ -157,4 +181,34 @@ func (q *Queries) GetPolicyByName(ctx context.Context, name string) (*Policy, er
 		&i.CreatedAt,
 	)
 	return &i, err
+}
+
+const updatePolicy = `-- name: UpdatePolicy :execrows
+UPDATE policies SET name = ?, description = ?, auto_sign = ?, subject_cn_regex = ?, san_dns_regex = ?, max_requested_days = ? WHERE id = ?
+`
+
+type UpdatePolicyParams struct {
+	Name             string  `json:"name"`
+	Description      *string `json:"description"`
+	AutoSign         int64   `json:"auto_sign"`
+	SubjectCnRegex   *string `json:"subject_cn_regex"`
+	SanDnsRegex      *string `json:"san_dns_regex"`
+	MaxRequestedDays *int64  `json:"max_requested_days"`
+	ID               int64   `json:"id"`
+}
+
+func (q *Queries) UpdatePolicy(ctx context.Context, arg UpdatePolicyParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, updatePolicy,
+		arg.Name,
+		arg.Description,
+		arg.AutoSign,
+		arg.SubjectCnRegex,
+		arg.SanDnsRegex,
+		arg.MaxRequestedDays,
+		arg.ID,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }

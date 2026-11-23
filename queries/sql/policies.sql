@@ -12,3 +12,12 @@ SELECT * FROM policies WHERE id = ?;
 
 -- name: AddPolicy :one
 INSERT INTO policies (name, description, auto_sign, subject_cn_regex, san_dns_regex, max_requested_days, created_at) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *;
+
+-- name: DeletePolicyByID :execrows
+DELETE FROM policies WHERE id = ?;
+
+-- name: DeletePolicyByName :execrows
+DELETE FROM policies WHERE name = ?;
+
+-- name: UpdatePolicy :execrows
+UPDATE policies SET name = ?, description = ?, auto_sign = ?, subject_cn_regex = ?, san_dns_regex = ?, max_requested_days = ? WHERE id = ?;
